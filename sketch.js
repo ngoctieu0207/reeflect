@@ -686,28 +686,48 @@ function draw() {
 }
 
 // Shown once every coral has turned gray — the reef has fully died.
+// Title uses Inter Black, subtitle uses Alata — both Google Fonts, loaded
+// via the <link> in index.html's <head> (CSS web fonts, not something p5
+// loads itself). If that link isn't present, the browser just falls back to
+// the default font — nothing breaks.
 function drawReefDeadBanner() {
   push();
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
-  // "omnes-pro" comes from the Adobe Fonts (Typekit) kit — add this to your
-  // HTML <head>, this is a CSS web font, not something p5 loads itself:
-  //   <link rel="stylesheet" href="https://use.typekit.net/rav6zvx.css">
-  // If that link isn't present, the browser just falls back to the
-  // default font — nothing breaks.
-  textFont("omnes-pro");
+
+  const titleText = "The reef has gone silent.";
+  const titleSize = 80;
+  const subtitleText = "Every last coral has faded away.";
+  const subtitleSize = 32;
+
+  // measure both lines first so the background box always fits them,
+  // however wide these particular fonts/sizes end up rendering
+  textFont("Inter");
+  textSize(titleSize);
+  const titleW = textWidth(titleText);
+
+  textFont("Alata");
+  textSize(subtitleSize);
+  const subtitleW = textWidth(subtitleText);
+
+  const boxW = max(titleW, subtitleW) + 140;
+  const boxH = 260;
+  const titleY = height / 2 - 45;
+  const subtitleY = height / 2 + 45;
 
   noStroke();
   fill(10, 20, 35, 150);
-  rect(width / 2, height / 2, 780, 110, 18);
+  rect(width / 2, height / 2, boxW, boxH, 18);
 
   fill(255);
-  textSize(40);
-  text("The reef has gone silent.", width / 2, height / 2 - 18);
+  textFont("Inter");
+  textSize(titleSize);
+  text(titleText, width / 2, titleY);
 
   fill(220, 235, 245, 220);
-  textSize(19);
-  text("Every last coral has faded away.", width / 2, height / 2 + 26);
+  textFont("Alata");
+  textSize(subtitleSize);
+  text(subtitleText, width / 2, subtitleY);
 
   pop();
 }
