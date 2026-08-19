@@ -6,6 +6,39 @@ let rock5Img;
 let rock6Img;
 
 // ======================================================
+// AMBIENT SOUND
+// Both files are short clips looped seamlessly (setLoop) rather than
+// single one-shot plays — "underwater" is the base ambience, "bubbles" is
+// a second, quieter looped texture layered on top of it. Browsers block
+// audio until the visitor interacts with the page at least once, so
+// nothing plays until the #sound-toggle button is clicked (see setup()).
+// ======================================================
+
+let underwaterSound;
+let bubblesSound;
+let soundOn = false;
+
+function toggleSound() {
+  // userStartAudio() unlocks the browser's audio context on this first
+  // real click — required before .play() will do anything.
+  userStartAudio().then(() => {
+    soundOn = !soundOn;
+
+    if (soundOn) {
+      underwaterSound.play();
+      bubblesSound.play();
+    } else {
+      underwaterSound.pause();
+      bubblesSound.pause();
+    }
+
+    const btn = document.getElementById("sound-toggle");
+    btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+    btn.textContent = soundOn ? "🔊 Sound" : "🔇 Sound";
+  });
+}
+
+// ======================================================
 // FLOATING PARTICLES ("marine snow" dust drifting in the water)
 // ======================================================
 
@@ -185,6 +218,9 @@ function preload() {
   rock4Img = loadImage("assets/images/rock4.png");
   rock5Img = loadImage("assets/images/rock5.png");
   rock6Img = loadImage("assets/images/rock6.png");
+
+  underwaterSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-underwater-sound.wav");
+  bubblesSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-underwater-bubbles-sound.wav");
 }
 
 // ======================================================
@@ -652,6 +688,14 @@ function setup() {
   pixelDensity(1);
   randomizeCorals();
   initParticles();
+
+  underwaterSound.setLoop(true);
+  underwaterSound.setVolume(0.5);
+
+  bubblesSound.setLoop(true);
+  bubblesSound.setVolume(0.28); // quieter, layered on top of the base ambience
+
+  document.getElementById("sound-toggle").addEventListener("click", toggleSound);
 }
 
 function draw() {

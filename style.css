@@ -86,3 +86,43 @@ canvas {
 
   pointer-events: none;
 }
+
+
+/* ======================================================
+   SOUND TOGGLE
+====================================================== */
+
+#sound-toggle {
+  /* fixed to the browser viewport (not #scene) so it's always reachable
+     even when the 1920x1080 scene is bigger than the window and centered
+     with overflow — an absolutely-positioned corner element inside it can
+     end up scrolled out of reach */
+  position: fixed;
+
+  right: 32px;
+  top: 32px;
+
+  z-index: 20;
+
+  padding: 10px 20px;
+
+  font-family: Alata, sans-serif;
+  font-size: 18px;
+  color: #fff;
+
+  background: rgba(10, 20, 35, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+#sound-toggle:hover {
+  background: rgba(10, 20, 35, 0.75);
+}
+
+#sound-toggle[aria-pressed="true"] {
+  background: rgba(46, 194, 180, 0.55);
+  border-color: rgba(255, 255, 255, 0.6);
+}
