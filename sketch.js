@@ -6,33 +6,40 @@ let rock5Img;
 let rock6Img;
 
 // ======================================================
-// AMBIENT SOUND
-// Both files are short clips looped seamlessly (setLoop) rather than
-// single one-shot plays — "underwater" is the base ambience, "bubbles" is
-// a second, quieter looped texture layered on top of it. Browsers block
-// audio until the visitor interacts with the page at least once, so
-// nothing plays until the #sound-toggle button is clicked (see setup()).
+// SOUND
+// Two ambient loops (underwater + rustling paper, both setLoop) plus three
+// one-shot effects triggered by specific game events (bubble breath, bubble
+// eating debris, UI click). Browsers block audio until the visitor
+// interacts with the page at least once, so nothing plays until the
+// #sound-toggle button is clicked (see setup()).
 // ======================================================
 
 let underwaterSound;
-let bubblesSound;
+let rustlingPaperSound;
+let bubbleBreathSound;
+let bubbleEatingSound;
+let clickSound;
 let soundOn = false;
 
 const UNDERWATER_VOLUME = 0.3;
-const BUBBLES_VOLUME = 0.28;
+const RUSTLING_PAPER_VOLUME = 0.06; // coral "rustle" — barely-there background texture
+const BUBBLE_BREATH_VOLUME = 0.2; // plays often (every coral breath), keep it light
+const BUBBLE_EATING_VOLUME = 0.15; // small, just audible
+const CLICK_VOLUME = 0.4;
 
 function toggleSound() {
   // userStartAudio() unlocks the browser's audio context on this first
   // real click — required before .play() will do anything.
   userStartAudio().then(() => {
     soundOn = !soundOn;
+    clickSound.play(); // plays on every toggle, on or off
 
     if (soundOn) {
       underwaterSound.play();
-      bubblesSound.play();
+      rustlingPaperSound.play();
     } else {
       underwaterSound.pause();
-      bubblesSound.pause();
+      rustlingPaperSound.pause();
     }
 
     updateSoundButton();
@@ -47,21 +54,21 @@ function updateSoundButton() {
     : "assets/images/speaker-x.svg";
 }
 
-// Called once, the instant the reef fully dies — fades both loops out to
-// match "the reef has gone silent" instead of just cutting them off.
+// Called once, the instant the reef fully dies — fades both ambient loops
+// out to match "the reef has gone silent" instead of just cutting them off.
 function silenceAmbientSounds() {
   if (!soundOn) return;
 
   const fadeTime = 1.5;
   underwaterSound.fade(0, fadeTime);
-  bubblesSound.fade(0, fadeTime);
+  rustlingPaperSound.fade(0, fadeTime);
 
   setTimeout(() => {
     underwaterSound.pause();
-    bubblesSound.pause();
+    rustlingPaperSound.pause();
     // restore their normal volume for the next time sound is turned on
     underwaterSound.setVolume(UNDERWATER_VOLUME);
-    bubblesSound.setVolume(BUBBLES_VOLUME);
+    rustlingPaperSound.setVolume(RUSTLING_PAPER_VOLUME);
   }, fadeTime * 1000);
 
   soundOn = false;
@@ -250,7 +257,10 @@ function preload() {
   rock6Img = loadImage("assets/images/rock6.png");
 
   underwaterSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-underwater-sound.wav");
-  bubblesSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-underwater-bubbles-sound.wav");
+  rustlingPaperSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-rustling-paper-sound.wav");
+  bubbleBreathSound = loadSound("assets/sounds/underwater-bubble-sound.wav");
+  bubbleEatingSound = loadSound("assets/sounds/bubble-eating-sound.wav");
+  clickSound = loadSound("assets/sounds/click-sound.wav");
 }
 
 // ======================================================
@@ -609,6 +619,7 @@ let nextBubbleSpawnAt = 0;
 function spawnBubbleFromCoral() {
   if (coralPlan.length === 0) return;
   const coral = coralPlan[floor(random(coralPlan.length))];
+  if (soundOn) bubbleBreathSound.play(); // coral "breathing out" this bubble
   bubbles.push({
     x: coral.groundX + random(-12, 12),
     y: coral.groundY - random(0, 10),
@@ -654,6 +665,7 @@ function updateAndDrawBubbles(frozen = false) {
           b.r = min(b.r + 12, 22); // cap growth so bubbles can't snowball into giant nets
           b.swallowed.push({ fn: c.fn, center: c.center, hue: c.hue });
           floatingCreatures.splice(j, 1);
+          if (soundOn) bubbleEatingSound.play();
         }
       }
     }
@@ -722,8 +734,18 @@ function setup() {
   underwaterSound.setLoop(true);
   underwaterSound.setVolume(UNDERWATER_VOLUME);
 
-  bubblesSound.setLoop(true);
-  bubblesSound.setVolume(BUBBLES_VOLUME); // quieter, layered on top of the base ambience
+  rustlingPaperSound.setLoop(true);
+  rustlingPaperSound.setVolume(RUSTLING_PAPER_VOLUME);
+
+  // one-shot effects: allow overlapping plays (multiple bubbles can breathe
+  // out or swallow debris close together) instead of cutting each other off
+  bubbleBreathSound.playMode("sustain");
+  bubbleBreathSound.setVolume(BUBBLE_BREATH_VOLUME);
+
+  bubbleEatingSound.playMode("sustain");
+  bubbleEatingSound.setVolume(BUBBLE_EATING_VOLUME);
+
+  clickSound.setVolume(CLICK_VOLUME);
 
   document.getElementById("sound-toggle").addEventListener("click", toggleSound);
 }

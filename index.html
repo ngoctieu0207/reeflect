@@ -49,5 +49,20 @@
 
   </div>
 
+  <!-- Scales #scene to whatever the largest size is that still fits the
+       viewport while keeping its 1920x1080 (16:9) box intact — so the page
+       never has to scroll or letterbox, it just shrinks/grows as one piece.
+       Plain JS, independent of p5 (which only draws inside the already-sized
+       canvas) so it also applies before/without the p5 script ever loading. -->
+  <script>
+    function fitScene() {
+      var scene = document.getElementById("scene");
+      var scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      scene.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
+    }
+    window.addEventListener("resize", fitScene);
+    fitScene();
+  </script>
+
 </body>
 </html>
