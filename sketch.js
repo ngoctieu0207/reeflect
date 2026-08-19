@@ -42,7 +42,9 @@ function toggleSound() {
 function updateSoundButton() {
   const btn = document.getElementById("sound-toggle");
   btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
-  btn.textContent = soundOn ? "🔊" : "🔇";
+  document.getElementById("sound-toggle-icon").src = soundOn
+    ? "assets/images/speaker-high.svg"
+    : "assets/images/speaker-x.svg";
 }
 
 // Called once, the instant the reef fully dies — fades both loops out to
