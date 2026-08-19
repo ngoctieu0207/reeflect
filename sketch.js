@@ -18,6 +18,9 @@ let underwaterSound;
 let bubblesSound;
 let soundOn = false;
 
+const UNDERWATER_VOLUME = 0.3;
+const BUBBLES_VOLUME = 0.28;
+
 function toggleSound() {
   // userStartAudio() unlocks the browser's audio context on this first
   // real click — required before .play() will do anything.
@@ -32,10 +35,35 @@ function toggleSound() {
       bubblesSound.pause();
     }
 
-    const btn = document.getElementById("sound-toggle");
-    btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
-    btn.textContent = soundOn ? "🔊 Sound" : "🔇 Sound";
+    updateSoundButton();
   });
+}
+
+function updateSoundButton() {
+  const btn = document.getElementById("sound-toggle");
+  btn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+  btn.textContent = soundOn ? "🔊" : "🔇";
+}
+
+// Called once, the instant the reef fully dies — fades both loops out to
+// match "the reef has gone silent" instead of just cutting them off.
+function silenceAmbientSounds() {
+  if (!soundOn) return;
+
+  const fadeTime = 1.5;
+  underwaterSound.fade(0, fadeTime);
+  bubblesSound.fade(0, fadeTime);
+
+  setTimeout(() => {
+    underwaterSound.pause();
+    bubblesSound.pause();
+    // restore their normal volume for the next time sound is turned on
+    underwaterSound.setVolume(UNDERWATER_VOLUME);
+    bubblesSound.setVolume(BUBBLES_VOLUME);
+  }, fadeTime * 1000);
+
+  soundOn = false;
+  updateSoundButton();
 }
 
 // ======================================================
@@ -690,10 +718,10 @@ function setup() {
   initParticles();
 
   underwaterSound.setLoop(true);
-  underwaterSound.setVolume(0.5);
+  underwaterSound.setVolume(UNDERWATER_VOLUME);
 
   bubblesSound.setLoop(true);
-  bubblesSound.setVolume(0.28); // quieter, layered on top of the base ambience
+  bubblesSound.setVolume(BUBBLES_VOLUME); // quieter, layered on top of the base ambience
 
   document.getElementById("sound-toggle").addEventListener("click", toggleSound);
 }
@@ -706,6 +734,7 @@ function draw() {
   const reefDead = coralPlan.length > 0 && coralPlan.every((c) => c.faded);
   if (reefDead && reefDeathTime === null) {
     reefDeathTime = millis(); // freeze seaweed's sway at this exact instant
+    silenceAmbientSounds(); // the reef has gone silent — fade the ambience out too
   }
 
   // same hand-drawn shapes, same original spots — only their color and
