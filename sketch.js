@@ -38,7 +38,8 @@ const RUSTLING_PAPER_VOLUME = 0.09; // coral "rustle"/sway — still light, just
 const BUBBLE_BREATH_VOLUME = 0.045; // fires very often, so kept light (see note above)
 const BUBBLE_BREATH_CHANCE = 0.55; // only some exhales actually play a sound
 const BUBBLE_EATING_VOLUME = 0.09; // rarer event, allowed to read a bit clearer
-const DIE_CORAL_VOLUME = 1; // a coral dying is a notable beat — let it stand out, loud and clear
+const DIE_CORAL_VOLUME = 1; // p5.sound's own volume cap — extra loudness beyond this comes from DIE_CORAL_GAIN_BOOST below
+const DIE_CORAL_GAIN_BOOST = 2.2; // extra amplification on top of DIE_CORAL_VOLUME, applied via a raw Web Audio GainNode (see setup()) since p5.sound's setVolume() alone can't exceed 1
 const CLICK_VOLUME = 0.4;
 
 function toggleSound() {
@@ -287,12 +288,12 @@ function preload() {
   canImg2 = loadImage("assets/images/can2.svg");
   canImg3 = loadImage("assets/images/can3.svg");
 
-  underwaterSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-underwater-sound.wav");
-  rustlingPaperSound = loadSound("assets/sounds/COMM2754-2026-S2-A1w04-Seariously-rustling-paper-sound.wav");
-  bubbleBreathSound = loadSound("assets/sounds/underwater-bubble-sound.wav");
-  bubbleEatingSound = loadSound("assets/sounds/bubble-eating-sound.wav");
-  dieCoralSound = loadSound("assets/sounds/die-coral-sound.wav");
-  clickSound = loadSound("assets/sounds/click-sound.wav");
+  underwaterSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-underwater-sound.wav");
+  rustlingPaperSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-coral-sound.wav");
+  bubbleBreathSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-underwater-bubble-sound.wav");
+  bubbleEatingSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-bubble-eating-sound.wav");
+  dieCoralSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-coral-die-sound.wav");
+  clickSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-clicking-sound.wav");
 }
 
 // ======================================================
@@ -661,6 +662,19 @@ function setup() {
 
   dieCoralSound.playMode("sustain");
   dieCoralSound.setVolume(DIE_CORAL_VOLUME);
+  // p5.sound's setVolume() is clamped to [0, 1], so it can't make this any
+  // louder on its own. To push it past that, route the sound through its
+  // own raw Web Audio GainNode set above 1 — rewires the sound's output
+  // from p5's master bus through this extra amplifier stage, then back into
+  // the master bus, so only this one sound gets the boost.
+  {
+    const ctx = getAudioContext();
+    const boostGain = ctx.createGain();
+    boostGain.gain.value = DIE_CORAL_GAIN_BOOST;
+    dieCoralSound.disconnect();
+    dieCoralSound.panner.connect(boostGain);
+    boostGain.connect(ctx.destination);
+  }
 
   clickSound.setVolume(CLICK_VOLUME);
 
