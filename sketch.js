@@ -35,9 +35,9 @@ let soundOn = false;
 
 const UNDERWATER_VOLUME = 0.28; // background bed — present but not the loudest thing
 const RUSTLING_PAPER_VOLUME = 0.09; // coral "rustle"/sway — still light, just less buried
-const BUBBLE_BREATH_VOLUME = 0.045; // fires very often, so kept light (see note above)
+const BUBBLE_BREATH_VOLUME = 0.022; // fires very often, so kept light (see note above) — turned down further
 const BUBBLE_BREATH_CHANCE = 0.55; // only some exhales actually play a sound
-const BUBBLE_EATING_VOLUME = 0.09; // rarer event, allowed to read a bit clearer
+const BUBBLE_EATING_VOLUME = 0.045; // rarer event, allowed to read a bit clearer — turned down further
 const DIE_CORAL_VOLUME = 1; // p5.sound's own volume cap — extra loudness beyond this comes from DIE_CORAL_GAIN_BOOST below
 const DIE_CORAL_GAIN_BOOST = 2.2; // extra amplification on top of DIE_CORAL_VOLUME, applied via a raw Web Audio GainNode (see setup()) since p5.sound's setVolume() alone can't exceed 1
 const CLICK_VOLUME = 0.4;
