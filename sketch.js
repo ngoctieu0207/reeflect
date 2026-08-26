@@ -269,12 +269,12 @@ function preload() {
   trashCanImg2 = loadImage("assets/images/can2.svg");
   trashCanImg3 = loadImage("assets/images/can3.svg");
 
-  underwaterSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-underwater-sound.wav");
-  coralMovementSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-coral-movement-sound.wav");
-  bubbleBreathSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-underwater-bubble-sound.wav");
-  bubbleEatingSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-bubble-eating-sound.wav");
-  dieCoralSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-coral-die-sound.wav");
-  clickSound = loadSound("assets/sounds/COMM2754-2026-S2-A2w09-Seaventure-clicking-sound.wav");
+  underwaterSound = loadSound("assets/sounds/underwater-sound.wav");
+  coralMovementSound = loadSound("assets/sounds/coral-movement-sound.wav");
+  bubbleBreathSound = loadSound("assets/sounds/underwater-bubble-sound.wav");
+  bubbleEatingSound = loadSound("assets/sounds/bubble-eating-sound.wav");
+  dieCoralSound = loadSound("assets/sounds/coral-die-sound.wav");
+  clickSound = loadSound("assets/sounds/clicking-sound.wav");
 }
 
 // ======================================================
